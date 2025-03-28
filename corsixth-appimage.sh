@@ -41,7 +41,7 @@ wget https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/lin
 chmod +x linuxdeploy-x86_64.AppImage
 
 # Copy some deps over manually
-luarocks install lpeg --lua-version 5.4
+sudo luarocks install lpeg --lua-version 5.4
 mkdir -p ../AppDir/usr/share/corsix-th/socket
 cp  /usr/lib/x86_64-linux-gnu/lua/5.4/lfs.so \
     /usr/local/lib/lua/5.4/lpeg.so \
