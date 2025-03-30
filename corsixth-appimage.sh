@@ -1,7 +1,9 @@
 #!/bin/bash
+## NOTE: Not suitable for use on Corsix-TH versions prior to v0.68.0!!
 # Initialise
 echo "Would you like to specify a version number?"
-read ver
+echo "e.g. v0.69.0, or leave blank to create an appimage form master"
+read -r ver
 
 # Install packages
 sudo apt-get install -y \
@@ -11,15 +13,26 @@ sudo apt-get install -y \
     libswresample-dev libswscale-dev libvorbis-dev lua-filesystem luarocks lua-sec lua-socket \
     libwhereami-dev wget
 
-# Clone repo
-## Clone from master
-#git clone https://github.com/CorsixTH/CorsixTH.git
+## Clone repo
+# Check the branch specified exists
+if ! git ls-remote --exit-code --heads origin "$ver" &> /dev/null; then
+  echo "Error: Branch '$ver' does not exist."
+  exit 1
+fi
 
-## Or clone from 0.68.0
-git clone https://github.com/CorsixTH/CorsixTH.git --branch v0.68.0
-## If using 0.68.0, apply main.cpp patch
-wget https://raw.githubusercontent.com/CorsixTH/CorsixTH/96548ac4bc9c9e83cf7c44cb038eda6958862143/CorsixTH/Src/main.cpp
-yes | cp -v ./main.cpp ./CorsixTH/CorsixTH/Src/main.cpp
+# Clone with specified version set with $ver
+if [ -n "$ver" ]; then
+    echo "Cloning $ver..."
+    git clone https://github.com/CorsixTH/CorsixTH.git --branch "$ver"
+else
+# Clone from master if no version set
+    echo "Cloning from master..."
+    git clone https://github.com/CorsixTH/CorsixTH.git
+fi
+
+if [ "$ver" = "v0.68.0" ]; then
+    wget https://raw.githubusercontent.com/CorsixTH/CorsixTH/96548ac4bc9c9e83cf7c44cb038eda6958862143/CorsixTH/Src/main.cpp -P ./CorsixTH/CorsixTH/Src/
+fi
 
 # Go to project
 cd CorsixTH || exit 1
@@ -143,6 +156,6 @@ wget https://github.com/Jacalz/fluid-soundfont/raw/master/SF3/FluidR3.sf3 -P ../
 # Rename
 if [ -n "$ver" ]
 then
-  echo "Renaming the AppImage as requested."
-  mv CorsixTH-x86_64.AppImage CorsixTH-$ver-x86_64.AppImage
+  echo "Renaming the AppImage to the version requested."
+  mv CorsixTH-x86_64.AppImage CorsixTH-"$ver"-x86_64.AppImage
 fi
