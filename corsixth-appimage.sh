@@ -2,8 +2,8 @@
 ## NOTE: Not suitable for use on Corsix-TH versions prior to v0.68.0!!
 # Initialise
 repo_url="https://github.com/CorsixTH/CorsixTH.git"
-echo "Would you like to specify a version number?"
-echo "e.g. v0.69.0, or leave blank to create an appimage form master"
+echo "Would you like to specify a branch or tag?"
+echo "e.g. v0.69.0, or leave blank to create an appimage from master"
 read -r ver
 
 # Install packages
@@ -32,7 +32,8 @@ else
 fi
 
 if [ "$ver" = "v0.68.0" ]; then
-    wget https://raw.githubusercontent.com/CorsixTH/CorsixTH/96548ac4bc9c9e83cf7c44cb038eda6958862143/CorsixTH/Src/main.cpp -P ./CorsixTH/CorsixTH/Src/
+    echo "Copying AppImage patch..."
+    wget https://raw.githubusercontent.com/CorsixTH/CorsixTH/96548ac4bc9c9e83cf7c44cb038eda6958862143/CorsixTH/Src/main.cpp -O ./CorsixTH/CorsixTH/Src/main.cpp
 fi
 
 # Go to project
@@ -136,7 +137,6 @@ wget https://github.com/Jacalz/fluid-soundfont/raw/master/SF3/FluidR3.sf3 -P ../
     --exclude-library libsystemd* \
     --exclude-library libtasn* \
     --exclude-library libthai* \
-    --exclude-library libtheoraenc* \
     --exclude-library libtinfo* \
     --exclude-library libudfread* \
     --exclude-library libunistring* \
@@ -148,7 +148,6 @@ wget https://github.com/Jacalz/fluid-soundfont/raw/master/SF3/FluidR3.sf3 -P ../
     --exclude-library libX* \
     --exclude-library libxcb* \
     --exclude-library libxkbcommon* \
-    --exclude-library libxml* \
     --exclude-library libxvidcore* \
     --exclude-library libzmq* \
     --exclude-library libzstd* \
