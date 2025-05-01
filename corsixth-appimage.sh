@@ -1,6 +1,7 @@
 #!/bin/bash
 ## NOTE: Not suitable for use on Corsix-TH versions prior to v0.68.0!!
 # Initialise
+repo_url="https://github.com/CorsixTH/CorsixTH.git"
 echo "Would you like to specify a version number?"
 echo "e.g. v0.69.0, or leave blank to create an appimage form master"
 read -r ver
@@ -15,19 +16,19 @@ sudo apt-get install -y \
 
 ## Clone repo
 # Check the branch specified exists
-if ! git ls-remote --exit-code --heads origin "$ver" &> /dev/null; then
-  echo "Error: Branch '$ver' does not exist."
+if ! (git ls-remote --exit-code --heads "$repo_url" "$ver" || git ls-remote --exit-code --tags "$repo_url" "$ver") &> /dev/null; then
+  echo "Error: '$ver' is neither a branch nor a tag in $repo_url"
   exit 1
 fi
 
 # Clone with specified version set with $ver
 if [ -n "$ver" ]; then
     echo "Cloning $ver..."
-    git clone https://github.com/CorsixTH/CorsixTH.git --branch "$ver"
+    git clone $repo_url --branch "$ver"
 else
 # Clone from master if no version set
     echo "Cloning from master..."
-    git clone https://github.com/CorsixTH/CorsixTH.git
+    git clone $repo_url
 fi
 
 if [ "$ver" = "v0.68.0" ]; then
