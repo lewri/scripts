@@ -7,7 +7,7 @@ echo "e.g. v0.69.0, or leave blank to create an appimage from master"
 read -r ver
 
 # Install packages
-sudo apt-get install -y \
+apt-get update && apt-get install -y \
     build-essential cmake doxygen ffmpeg git graphviz libavfilter-dev libavformat-dev \
     libavutil-dev libavcodec-dev libavdevice-dev libcurl4-openssl-dev libfreetype-dev libflac++-dev \
     liblua5.4-dev libmikmod-dev libmpg123-dev libogg-dev libpostproc-dev libsdl2-dev libsdl2-mixer-dev \
