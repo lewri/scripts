@@ -111,7 +111,6 @@ wget https://github.com/Jacalz/fluid-soundfont/raw/master/SF3/FluidR3.sf3 -P ../
     --exclude-library liblzma* \
     --exclude-library libmd* \
     --exclude-library libmfx* \
-    --exclude-library libmodplug* \
     --exclude-library libmount* \
     --exclude-library libnettle* \
     --exclude-library libnghttp* \
