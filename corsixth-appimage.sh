@@ -89,7 +89,6 @@ wget https://github.com/Jacalz/fluid-soundfont/raw/master/SF3/FluidR3.sf3 -P ../
     --exclude-library libgcrypt* \
     --exclude-library libgio* \
     --exclude-library libglib* \
-    --exclude-library libgme* \
     --exclude-library libgmodule* \
     --exclude-library libgnutls* \
     --exclude-library libgobject* \
