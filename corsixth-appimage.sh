@@ -1,4 +1,5 @@
 #!/bin/bash
+## This runs suitably on LXC Ubuntu 22.04. Not currently tested on any other format/distro
 ## NOTE: Not suitable for use on Corsix-TH versions prior to v0.68.0!!
 # Initialise
 repo_url="https://github.com/CorsixTH/CorsixTH.git"
