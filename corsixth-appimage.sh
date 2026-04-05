@@ -13,7 +13,7 @@ apt-get update && apt-get install -y \
     libavutil-dev libavcodec-dev libavdevice-dev libcurl4-openssl-dev libfreetype-dev libflac++-dev \
     liblua5.4-dev libmikmod-dev libmpg123-dev libogg-dev libpostproc-dev libsdl2-dev libsdl2-mixer-dev \
     libswresample-dev libswscale-dev libvorbis-dev lua-filesystem luarocks lua-sec lua-socket \
-    libwhereami-dev wget
+    libwhereami-dev librtmidi-dev wget
 
 ## Clone repo
 # Check the branch specified exists
