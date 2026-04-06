@@ -16,6 +16,9 @@ apt-get update && apt-get install -y \
     libwhereami-dev librtmidi-dev zlib1g wget
 
 ## Clone repo
+# If $ver is unset or empty, default it to 'master'
+ver="${ver:-master}"
+
 # Check the branch specified exists
 if ! (git ls-remote --exit-code --heads "$repo_url" "$ver" || git ls-remote --exit-code --tags "$repo_url" "$ver") &> /dev/null; then
   echo "Error: '$ver' is neither a branch nor a tag in $repo_url"
