@@ -7,6 +7,9 @@ echo "Would you like to specify a branch or tag?"
 echo "e.g. v0.69.0, or leave blank to create an appimage from master"
 read -r ver
 
+# Let's make sure we know where we are first
+cd / || exit 1
+
 # Install packages
 apt-get update && apt-get install -y \
     build-essential cmake doxygen ffmpeg git graphviz libavfilter-dev libavformat-dev \
