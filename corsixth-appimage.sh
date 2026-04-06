@@ -2,7 +2,9 @@
 ## This runs suitably on LXC Ubuntu 22.04. Not currently tested on any other format/distro
 ## NOTE: Not suitable for use on Corsix-TH versions prior to v0.68.0!!
 # Initialise
-repo_url="https://github.com/CorsixTH/CorsixTH.git"
+# Temporary: Point to lewri's fork for testing
+repo_url="https://github.com/lewri/CorsixTH.git"
+#repo_url="https://github.com/CorsixTH/CorsixTH.git"
 echo "Would you like to specify a branch or tag?"
 echo "e.g. v0.69.0, or leave blank to create an appimage from master"
 read -r ver
