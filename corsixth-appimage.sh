@@ -53,7 +53,6 @@ cmake \
     -DSEARCH_LOCAL_DATADIRS=ON \
     -DUSE_SOURCE_DATADIRS=OFF \
     -DCMAKE_INSTALL_RPATH='\$ORIGIN/../lib' \
-    -D
     ..
 make -j"$(nproc)"
 make install
