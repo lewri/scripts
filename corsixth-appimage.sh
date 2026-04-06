@@ -29,7 +29,8 @@ if [ -n "$ver" ]; then
 else
 # Clone from master if no version set
     echo "Cloning from master..."
-    git clone $repo_url
+    ver="master"
+    git clone $repo_url --branch "$ver"
 fi
 
 if [ "$ver" = "v0.68.0" ]; then
