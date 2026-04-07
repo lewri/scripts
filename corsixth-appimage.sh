@@ -51,7 +51,7 @@ cmake \
     -DSEARCH_LOCAL_DATADIRS=ON \
     -DUSE_SOURCE_DATADIRS=OFF \
     -DLUA_INCLUDE_DIR=/usr/include/lua5.4 \
-    -DLUA_LIBRARY=/usr/lib/x86_64-linux-gnu/liblua5.4.so
+    -DLUA_LIBRARY=/usr/lib/x86_64-linux-gnu/liblua5.4.so \
     -DCMAKE_INSTALL_RPATH='\$ORIGIN/../lib' \
     ..
 make -j"$(nproc)"
