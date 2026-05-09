@@ -65,6 +65,7 @@ cmake \
     -DLUA_INCLUDE_DIR='/usr/include/lua5.4' \
     -DLUA_LIBRARY='/usr/lib/x86_64-linux-gnu/liblua5.4.so' \
     -DCMAKE_INSTALL_RPATH='\$ORIGIN/../lib' \
+    -DFETCH_UNICODE_FONT=ON \
     ..
 make -j"$(nproc)"
 make install
