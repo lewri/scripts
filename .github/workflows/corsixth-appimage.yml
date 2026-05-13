@@ -1,0 +1,231 @@
+name: Build CorsixTH AppImage
+
+on:
+  # GitHub cron is UTC.
+  # This runs weekly, then the workflow gates itself to every other ISO week.
+  schedule:
+    - cron: "17 3 * * 1"
+
+  # Allows manual builds from the GitHub Actions UI.
+  workflow_dispatch:
+    inputs:
+      fork:
+        description: "GitHub owner/org to build from"
+        required: false
+        default: "CorsixTH"
+      ref:
+        description: "Branch or tag to build"
+        required: false
+        default: "master"
+
+permissions:
+  contents: read
+
+jobs:
+  build-appimage:
+    name: Build AppImage
+    runs-on: ubuntu-latest
+
+    container:
+      image: ubuntu:22.04
+
+    env:
+      DEBIAN_FRONTEND: noninteractive
+      APPIMAGE_EXTRACT_AND_RUN: "1"
+
+    steps:
+      - name: Gate scheduled builds to every 2 weeks
+        if: github.event_name == 'schedule'
+        shell: bash
+        run: |
+          week="$(date -u +%V)"
+
+          if (( 10#$week % 2 != 0 )); then
+            echo "ISO week $week is not a build week; exiting successfully."
+            exit 0
+          fi
+
+          echo "ISO week $week is a build week; continuing."
+
+      - name: Set build inputs
+        id: inputs
+        shell: bash
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            fork="${{ github.event.inputs.fork }}"
+            ref="${{ github.event.inputs.ref }}"
+          else
+            fork="CorsixTH"
+            ref="master"
+          fi
+
+          fork="${fork:-CorsixTH}"
+          ref="${ref:-master}"
+
+          echo "fork=$fork" >> "$GITHUB_OUTPUT"
+          echo "ref=$ref" >> "$GITHUB_OUTPUT"
+
+          echo "Building from: https://github.com/$fork/CorsixTH.git"
+          echo "Ref: $ref"
+
+      - name: Set build date
+        id: date
+        shell: bash
+        run: |
+          echo "yyyymmdd=$(date -u +%Y%m%d)" >> "$GITHUB_OUTPUT"
+
+      - name: Install build dependencies
+        shell: bash
+        run: |
+          apt-get update
+
+          apt-get install -y \
+            build-essential \
+            ca-certificates \
+            cmake \
+            doxygen \
+            ffmpeg \
+            file \
+            git \
+            graphviz \
+            libavfilter-dev \
+            libavformat-dev \
+            libavutil-dev \
+            libavcodec-dev \
+            libavdevice-dev \
+            libcurl4-openssl-dev \
+            libfreetype-dev \
+            libflac++-dev \
+            libjack-jackd2-0 \
+            liblua5.4-dev \
+            libmikmod-dev \
+            libmpg123-dev \
+            libogg-dev \
+            libpostproc-dev \
+            librtmidi-dev \
+            libsdl2-dev \
+            libsdl2-mixer-dev \
+            libswresample-dev \
+            libswscale-dev \
+            libvorbis-dev \
+            libwhereami-dev \
+            lua-filesystem \
+            luarocks \
+            wget \
+            zlib1g
+
+      - name: Validate requested branch or tag exists
+        shell: bash
+        run: |
+          repo_url="https://github.com/${{ steps.inputs.outputs.fork }}/CorsixTH.git"
+          ref="${{ steps.inputs.outputs.ref }}"
+
+          if git ls-remote --exit-code --heads "$repo_url" "$ref" >/dev/null 2>&1; then
+            echo "'$ref' exists as a branch."
+            exit 0
+          fi
+
+          if git ls-remote --exit-code --tags "$repo_url" "$ref" >/dev/null 2>&1; then
+            echo "'$ref' exists as a tag."
+            exit 0
+          fi
+
+          echo "Error: '$ref' is neither a branch nor a tag in $repo_url"
+          exit 1
+
+      - name: Clone CorsixTH
+        shell: bash
+        run: |
+          repo_url="https://github.com/${{ steps.inputs.outputs.fork }}/CorsixTH.git"
+          ref="${{ steps.inputs.outputs.ref }}"
+
+          git clone \
+            --branch "$ref" \
+            --depth 1 \
+            "$repo_url" \
+            CorsixTH
+
+      - name: Configure and build CorsixTH
+        shell: bash
+        working-directory: CorsixTH
+        run: |
+          mkdir build
+          cd build
+
+          cmake \
+            -DCMAKE_INSTALL_PREFIX=../AppDir/usr \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DSEARCH_LOCAL_DATADIRS=ON \
+            -DUSE_SOURCE_DATADIRS=OFF \
+            -DLUA_INCLUDE_DIR=/usr/include/lua5.4 \
+            -DLUA_LIBRARY=/usr/lib/x86_64-linux-gnu/liblua5.4.so \
+            -DCMAKE_INSTALL_RPATH='$ORIGIN/../lib' \
+            -DFETCH_UNICODE_FONT=ON \
+            ..
+
+          make -j"$(nproc)"
+          make install
+
+      - name: Download linuxdeploy
+        shell: bash
+        working-directory: CorsixTH/build
+        run: |
+          wget \
+            -O linuxdeploy-x86_64.AppImage \
+            https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
+
+          chmod +x linuxdeploy-x86_64.AppImage
+
+      - name: Add Lua dependencies and soundfont
+        shell: bash
+        working-directory: CorsixTH/build
+        run: |
+          luarocks install lpeg --lua-version 5.4
+
+          cp \
+            /usr/lib/x86_64-linux-gnu/lua/5.4/lfs.so \
+            /usr/local/lib/lua/5.4/lpeg.so \
+            ../AppDir/usr/share/corsix-th/
+
+          wget \
+            https://github.com/Jacalz/fluid-soundfont/raw/master/SF3/FluidR3.sf3 \
+            -P ../AppDir/usr/share/corsix-th
+
+      - name: Build AppImage
+        shell: bash
+        working-directory: CorsixTH/build
+        run: |
+          ./linuxdeploy-x86_64.AppImage \
+            --appdir ../AppDir \
+            --output appimage \
+            --desktop-file ../AppDir/usr/share/applications/com.corsixth.corsixth.desktop \
+            --icon-file ../AppDir/usr/share/icons/hicolor/scalable/apps/corsix-th.svg \
+            --library=/usr/lib/x86_64-linux-gnu/libjack.so.0
+
+      - name: Rename AppImage
+        id: rename
+        shell: bash
+        working-directory: CorsixTH/build
+        run: |
+          ref="${{ steps.inputs.outputs.ref }}"
+          safe_ref="$(echo "$ref" | tr '/' '-')"
+          build_date="${{ steps.date.outputs.yyyymmdd }}"
+
+          if [[ "$ref" == "master" ]]; then
+            appimage_name="CorsixTH-master-${build_date}-x86_64.AppImage"
+          else
+            appimage_name="CorsixTH-${safe_ref}-x86_64.AppImage"
+          fi
+
+          mv CorsixTH-x86_64.AppImage "$appimage_name"
+
+          echo "appimage_name=$appimage_name" >> "$GITHUB_OUTPUT"
+          echo "Created AppImage: $appimage_name"
+
+      - name: Upload AppImage artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.rename.outputs.appimage_name }}
+          path: CorsixTH/build/${{ steps.rename.outputs.appimage_name }}
+          if-no-files-found: error
+          retention-days: 30
