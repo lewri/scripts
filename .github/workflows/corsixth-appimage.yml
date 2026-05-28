@@ -2,9 +2,9 @@ name: Build CorsixTH AppImage
 
 on:
   # GitHub cron is UTC.
-  # This runs weekly, then the workflow gates itself to every other ISO week.
+  # This runs on the 1st and 15th of every month.
   schedule:
-    - cron: "17 3 * * 1"
+    - cron: "17 3 1,15 * *"
 
   # Allows manual builds from the GitHub Actions UI.
   workflow_dispatch:
@@ -34,19 +34,6 @@ jobs:
       APPIMAGE_EXTRACT_AND_RUN: "1"
 
     steps:
-      - name: Gate scheduled builds to every 2 weeks
-        if: github.event_name == 'schedule'
-        shell: bash
-        run: |
-          week="$(date -u +%V)"
-
-          if (( 10#$week % 2 != 0 )); then
-            echo "ISO week $week is not a build week; exiting successfully."
-            exit 0
-          fi
-
-          echo "ISO week $week is a build week; continuing."
-
       - name: Set build inputs
         id: inputs
         shell: bash
