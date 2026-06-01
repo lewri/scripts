@@ -210,7 +210,7 @@ jobs:
           echo "Created AppImage: $appimage_name"
 
       - name: Upload AppImage artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ steps.rename.outputs.appimage_name }}
           path: CorsixTH/build/${{ steps.rename.outputs.appimage_name }}
