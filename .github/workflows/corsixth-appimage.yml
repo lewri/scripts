@@ -215,4 +215,5 @@ jobs:
           name: ${{ steps.rename.outputs.appimage_name }}
           path: CorsixTH/build/${{ steps.rename.outputs.appimage_name }}
           if-no-files-found: error
+          archive: false
           retention-days: 30
