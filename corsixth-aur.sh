@@ -34,6 +34,10 @@ git add PKGBUILD .SRCINFO
 echo "==> Committing updates: '$COMMIT_MSG'"
 git commit -m "$COMMIT_MSG"
 
+# Enforce the correct SSH remote URL to prevent 403 HTTPS errors
+echo "==> Enforcing SSH remote URL..."
+git remote set-url origin "ssh://aur@aur.archlinux.org/${pkgname}.git"
+
 echo "==> Pushing to the AUR remote..."
 git push
 
